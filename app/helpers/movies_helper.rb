@@ -5,7 +5,13 @@ module MoviesHelper
   end
   def sortable(column, title = nil)
     title ||= column.titleize
-    link_to title, :sort => column
+    id = ""
+    if column == "title"
+      id = "title_header"
+    else
+      id = "release_date_header"
+    end
+    link_to title, {:sort => column}, :id => id
   end
   def helper_class(field)
     if(params[:sort].to_s == field)
