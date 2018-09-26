@@ -11,8 +11,48 @@ class MoviesController < ApplicationController
   end
 
   def index
-    @movies = Movie.order(params[:sort])
+    @all_ratings = Movie.rate.uniq
+    if session[:sort] ==nil or (params[:sort]!=session[:sort] and params[:sort]!=nil)
+      if params[:sort] ==nil
+        session[:sort] = ""
+      else
+        session[:sort] = params[:sort]
+      end
+    end
+    if session[:ratings] == nil or params[:commit]!=nil
+      if params[:ratings] != nil
+        session[:ratings] = params[:ratings]
+      else
+        session[:ratings] = []
+      end
+    end
+    @rate_checking = session[:ratings]
+    if session[:ratings].blank?
+      if session[:sort] == ""
+        @movies = Movie.all
+      else
+        @movies = Movie.order(session[:sort])
+      end
+    else 
+      if session[:sort]==""
+        @movies = Movie.all.select {|i| session[:ratings].include?(i.rating)?true:false}
+      else
+        @movies = Movie.order("#{session[:sort]}").select {|i| session[:ratings].include?(i.rating)?true:false}
+      end
+    end
+   
+   @class_var = ""
+   @class_var2 = ""
+    if session[:sort] == "title"
+     @class_var = "hilite"
+     @class_var2 = ""
+    elsif session[:sort] == "release_date"
+      @class_var = ""
+      @class_var2 ="hilite"
+    end
   end
+  
+  
 
   def new
     # default: render 'new' template
